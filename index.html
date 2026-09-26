@@ -1,697 +1,2096 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>CTC Salary Calculator</title>
 
+
 <style>
-    * {
-        box-sizing: border-box;
-    }
+
+/* =========================================================
+   GENERAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 25px;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f3f5f7;
+
+    color: #222;
+}
+
+
+.container {
+
+    max-width: 1250px;
+
+    margin: auto;
+
+    background: #ffffff;
+
+    padding: 20px;
+
+    border: 1px solid #c8c8c8;
+
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.title {
+
+    text-align: center;
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   INPUT AREA
+========================================================= */
+
+.input-area {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 15px;
+}
+
+
+.input-area label {
+
+    font-weight: bold;
+}
+
+
+.input-area input {
+
+    width: 220px;
+
+    padding: 9px 10px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    border: 2px solid #999;
+
+    border-radius: 4px;
+
+    outline: none;
+}
+
+
+.input-area input:focus {
+
+    border-color: #4472c4;
+}
+
+
+.enter-note {
+
+    color: #d00000;
+
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   ITERATION SETTINGS
+========================================================= */
+
+.iteration-box {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    background: #f5f5f5;
+
+    border: 1px solid #c7c7c7;
+}
+
+
+.iteration-box label {
+
+    font-weight: bold;
+}
+
+
+.iteration-box input {
+
+    width: 130px;
+
+    padding: 7px;
+
+    border: 1px solid #999;
+
+    border-radius: 4px;
+}
+
+
+/* =========================================================
+   ITERATION STATUS
+========================================================= */
+
+.status {
+
+    margin-bottom: 15px;
+
+    padding: 9px 12px;
+
+    background: #eef5ff;
+
+    border: 1px solid #b7cce8;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    color: #333;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+table {
+
+    width: 100%;
+
+    min-width: 950px;
+
+    border-collapse: collapse;
+
+    table-layout: fixed;
+}
+
+
+th,
+td {
+
+    border: 1px solid #999;
+
+    padding: 8px 10px;
+
+    font-size: 14px;
+}
+
+
+th {
+
+    background: #8ea9c4;
+
+    color: #000;
+
+    text-align: center;
+
+    font-weight: bold;
+}
+
+
+td:first-child {
+
+    width: 27%;
+
+    text-align: left;
+}
+
+
+td:nth-child(2) {
+
+    width: 14%;
+
+    text-align: right;
+}
+
+
+td:nth-child(3) {
+
+    width: 14%;
+
+    text-align: right;
+}
+
+
+td:nth-child(4) {
+
+    width: 17%;
+
+    text-align: left;
+}
+
+
+td:nth-child(5) {
+
+    width: 28%;
+
+    text-align: left;
+
+    font-family: Consolas, monospace;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   EXCEL-LIKE ROWS
+========================================================= */
+
+.section-row td {
+
+    background: #8ea9c4;
+
+    font-weight: bold;
+}
+
+
+.total-row td {
+
+    background: #8ea9c4;
+
+    font-weight: bold;
+}
+
+
+.highlight-row td {
+
+    background: #ffff00;
+
+    font-weight: bold;
+}
+
+
+.net-row td {
+
+    background: #ffff00;
+
+    font-weight: bold;
+
+    font-size: 15px;
+}
+
+
+.amount {
+
+    text-align: right;
+
+    font-weight: bold;
+}
+
+
+.basis {
+
+    color: #e00000;
+
+    font-weight: bold;
+}
+
+
+.formula {
+
+    color: #333;
+
+    font-family: Consolas, monospace;
+}
+
+
+/* =========================================================
+   DEBUG / ITERATION INFORMATION
+========================================================= */
+
+.debug-panel {
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    border: 1px solid #bbb;
+
+    background: #fafafa;
+}
+
+
+.debug-panel h3 {
+
+    margin-top: 0;
+
+    font-size: 16px;
+}
+
+
+.debug-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 10px;
+}
+
+
+.debug-item {
+
+    padding: 10px;
+
+    background: white;
+
+    border: 1px solid #ddd;
+}
+
+
+.debug-label {
+
+    display: block;
+
+    font-size: 12px;
+
+    color: #666;
+
+    margin-bottom: 4px;
+}
+
+
+.debug-value {
+
+    font-weight: bold;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+button {
+
+    padding: 9px 18px;
+
+    border: none;
+
+    border-radius: 4px;
+
+    background: #4472c4;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+button:hover {
+
+    background: #365f91;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.note {
+
+    margin-top: 15px;
+
+    font-size: 12px;
+
+    color: #666;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width: 700px) {
 
     body {
-        margin: 0;
-        padding: 25px;
-        background: #f4f6f8;
-        font-family: Arial, Helvetica, sans-serif;
-        color: #222;
+
+        padding: 10px;
     }
 
     .container {
-        max-width: 1200px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border: 1px solid #ccc;
-        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-    }
 
-    h1 {
-        text-align: center;
-        margin: 5px 0 20px;
-        font-size: 26px;
-    }
-
-    .input-section {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
-        flex-wrap: wrap;
-    }
-
-    .input-section label {
-        font-weight: bold;
-    }
-
-    .input-section input {
-        width: 220px;
         padding: 10px;
-        font-size: 16px;
-        font-weight: bold;
-        border: 2px solid #aaa;
-        border-radius: 4px;
     }
 
-    .input-section span {
-        color: #d00000;
-        font-weight: bold;
+    .title {
+
+        font-size: 21px;
     }
 
-    table {
+    .input-area {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .input-area input {
+
         width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
     }
 
-    th,
-    td {
-        border: 1px solid #aaa;
-        padding: 8px 10px;
-        font-size: 14px;
-    }
+}
 
-    th {
-        background: #8ea9c4;
-        color: #000;
-        font-weight: bold;
-        text-align: center;
-    }
-
-    td:first-child {
-        width: 32%;
-        text-align: left;
-    }
-
-    td:nth-child(2),
-    td:nth-child(3) {
-        width: 18%;
-        text-align: right;
-    }
-
-    td:nth-child(4) {
-        width: 20%;
-        text-align: left;
-        color: #e00000;
-        font-weight: bold;
-    }
-
-    td:nth-child(5) {
-        width: 32%;
-        font-family: Consolas, monospace;
-        font-size: 13px;
-    }
-
-    .section {
-        background: #8ea9c4;
-        font-weight: bold;
-    }
-
-    .highlight {
-        background: #ffff00;
-        font-weight: bold;
-    }
-
-    .total {
-        background: #8ea9c4;
-        font-weight: bold;
-    }
-
-    .net {
-        background: #ffff00;
-        font-weight: bold;
-        font-size: 16px;
-    }
-
-    .amount {
-        font-weight: bold;
-    }
-
-    .formula {
-        color: #333;
-    }
-
-    .note {
-        margin-top: 15px;
-        font-size: 13px;
-        color: #666;
-    }
-
-    @media (max-width: 800px) {
-
-        body {
-            padding: 10px;
-        }
-
-        .container {
-            padding: 10px;
-            overflow-x: auto;
-        }
-
-        table {
-            min-width: 900px;
-        }
-
-        h1 {
-            font-size: 22px;
-        }
-    }
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
-    <h1>CTC Salary Calculator</h1>
 
-    <div class="input-section">
-        <label for="annualCTC">Annual CTC</label>
+<div class="title">
 
-        <input
-            type="number"
-            id="annualCTC"
-            value="500000"
-            min="0"
-            step="1000"
-            oninput="calculateSalary()"
-        >
-<div class="iteration-settings">
+    CTC Salary Calculator
 
-    <label for="maxIterations">
-        Maximum Iterations
+</div>
+
+
+<!-- =====================================================
+     ANNUAL CTC INPUT
+===================================================== -->
+
+<div class="input-area">
+
+    <label for="annualCTC">
+
+        Annual CTC
+
     </label>
+
 
     <input
         type="number"
-        id="maxIterations"
+        id="annualCTC"
+        value="500000"
+        min="0"
+        step="1000"
+    >
+
+
+    <span class="enter-note">
+
+        &larr;&larr;&larr; Enter here
+
+    </span>
+
+</div>
+
+
+<!-- =====================================================
+     ITERATION SETTINGS
+===================================================== -->
+
+<div class="iteration-box">
+
+    <label for="numberOfIterations">
+
+        Number of Iterations:
+
+    </label>
+
+
+    <input
+        type="number"
+        id="numberOfIterations"
         value="32000"
         min="1"
         max="1000000"
         step="1"
-        onchange="calculateSalary()"
     >
 
-    <label for="maxChange">
-        Maximum Change
-    </label>
 
-    <input
-        type="number"
-        id="maxChange"
-        value="0.01"
-        min="0"
-        step="0.01"
-        onchange="calculateSalary()"
-    >
+    <button onclick="calculateSalary()">
+
+        Calculate
+
+    </button>
 
 </div>
-        <span>&larr;&larr;&larr; Enter here</span>
-    </div>
 
-    <table>
 
-        <thead>
-            <tr>
-                <th>Monthly Components</th>
-                <th>Per Month</th>
-                <th>Annualized</th>
-                <th>Calculation Basis</th>
-                <th>Formula</th>
-            </tr>
-        </thead>
+<!-- =====================================================
+     STATUS
+===================================================== -->
 
-        <tbody>
+<div class="status" id="status">
 
-            <!-- CTC -->
-            <tr class="highlight">
-                <td><strong>Annual CTC</strong></td>
-                <td id="monthlyCTC">41,667</td>
-                <td id="annualCTCDisplay">5,00,000</td>
-                <td></td>
-                <td class="formula">Annual CTC / 12</td>
-            </tr>
+    Ready to calculate.
 
-            <!-- Earnings -->
-            <tr>
-                <td>Basic</td>
-                <td class="amount" id="basic">18,757</td>
-                <td class="amount" id="basicAnnual">2,25,084</td>
-                <td>50% of Gross</td>
-                <td class="formula">ROUND(Gross × 50%, 0)</td>
-            </tr>
+</div>
 
-            <tr>
-                <td>House Rent Allowance</td>
-                <td class="amount" id="hra">9,379</td>
-                <td class="amount" id="hraAnnual">1,12,548</td>
-                <td>50% of Basic</td>
-                <td class="formula">ROUND(Basic × 50%, 0)</td>
-            </tr>
 
-            <tr>
-                <td>Travel Allowance</td>
-                <td class="amount" id="travel">1,800</td>
-                <td class="amount" id="travelAnnual">21,600</td>
-                <td>Fixed 1800</td>
-                <td class="formula">1,800</td>
-            </tr>
+<!-- =====================================================
+     SALARY TABLE
+===================================================== -->
 
-            <tr>
-                <td>Leave Travel Allowance</td>
-                <td class="amount" id="lta">1,876</td>
-                <td class="amount" id="ltaAnnual">22,512</td>
-                <td>10% of Basic</td>
-                <td class="formula">ROUND(Basic × 10%, 0)</td>
-            </tr>
+<div class="table-wrapper">
 
-            <tr>
-                <td>Other Allowances</td>
-                <td class="amount" id="other">5,703</td>
-                <td class="amount" id="otherAnnual">68,436</td>
-                <td></td>
-                <td class="formula">
-                    Monthly CTC − (Basic + HRA + Travel + LTA + Employer PF)
-                </td>
-            </tr>
+<table>
 
-            <tr class="total">
-                <td>Gross Salary</td>
-                <td id="gross">37,515</td>
-                <td id="grossAnnual">4,50,180</td>
-                <td></td>
-                <td class="formula">SUM(Basic:HRA:Travel:LTA:Other)</td>
-            </tr>
 
-            <!-- Statutory -->
-            <tr>
-                <td colspan="5" class="section">Statutory Payments</td>
-            </tr>
+<thead>
 
-            <tr>
-                <td>Employer Contribution to PF</td>
-                <td id="employerPF">3,250</td>
-                <td id="employerPFAnnual">39,000</td>
-                <td></td>
-                <td class="formula">ROUND(Basic × 13%, 0)</td>
-            </tr>
+<tr>
 
-            <tr>
-                <td>Employer Contribution to ESI</td>
-                <td id="employerESI">-</td>
-                <td id="employerESIAnnual">-</td>
-                <td></td>
-                <td class="formula">IF(Gross ≤ 21,000, Gross × 3.25%, 0)</td>
-            </tr>
+    <th>
+        Monthly Components
+    </th>
 
-            <tr class="total">
-                <td>Total Fixed Compensation</td>
-                <td id="fixedComp">40,765</td>
-                <td id="fixedCompAnnual">4,89,180</td>
-                <td></td>
-                <td class="formula">Gross + Employer PF + Employer ESI</td>
-            </tr>
+    <th>
+        Per Month
+    </th>
 
-            <!-- Gratuity -->
-            <tr>
-                <td>Gratuity</td>
-                <td id="gratuity">902</td>
-                <td id="gratuityAnnual">10,824</td>
-                <td>4.81% of Basic</td>
-                <td class="formula">ROUND(Basic × 4.81%, 0)</td>
-            </tr>
+    <th>
+        Annualized
+    </th>
 
-            <tr class="total">
-                <td>Total Cost to Company</td>
-                <td id="totalCTC">41,667</td>
-                <td id="totalCTCAnnual">5,00,004</td>
-                <td></td>
-                <td class="formula">Fixed Compensation + Gratuity</td>
-            </tr>
+    <th>
+        Calculation Basis
+    </th>
 
-            <!-- Deductions -->
-            <tr>
-                <td colspan="5" class="section">Deductions:</td>
-            </tr>
+    <th>
+        Formula
+    </th>
 
-            <tr>
-                <td>Employee Contribution to PF</td>
-                <td id="employeePF">3,000</td>
-                <td id="employeePFAnnual">36,000</td>
-                <td></td>
-                <td class="formula">
-                    MIN((Gross − HRA) × 12%, 3,000)
-                </td>
-            </tr>
+</tr>
 
-            <tr>
-                <td>Employee Contribution to ESI</td>
-                <td id="employeeESI">-</td>
-                <td id="employeeESIAnnual">-</td>
-                <td></td>
-                <td class="formula">IF(Gross &lt; 21,000, Gross × 0.75%, 0)</td>
-            </tr>
+</thead>
 
-            <tr>
-                <td>Professional Tax (TN)</td>
-                <td id="professionalTax">208</td>
-                <td id="professionalTaxAnnual">2,500</td>
-                <td>Fixed 208.33</td>
-                <td class="formula">208.33</td>
-            </tr>
 
-            <tr class="total">
-                <td>Total Deductions</td>
-                <td id="totalDeductions">3,208</td>
-                <td id="totalDeductionsAnnual">38,500</td>
-                <td></td>
-                <td class="formula">PF + ESI + Professional Tax</td>
-            </tr>
+<tbody>
 
-            <!-- Net -->
-            <tr class="net">
-                <td>Net Take Home Salary</td>
-                <td id="netSalary">34,307</td>
-                <td id="netSalaryAnnual">4,11,684</td>
-                <td></td>
-                <td class="formula">Gross − Total Deductions</td>
-            </tr>
 
-        </tbody>
-    </table>
+<!-- =====================================================
+     BASIC
+===================================================== -->
 
-    <div class="note">
-        * Salary calculations are illustrative. PF, ESI and Professional Tax rules may vary
-        based on applicable employment regulations and company policy.
-    </div>
+<tr>
+
+<td>
+    Basic
+</td>
+
+<td
+    id="basic"
+    class="amount">
+</td>
+
+<td
+    id="basicAnnual"
+    class="amount">
+</td>
+
+<td class="basis">
+    50% of Gross
+</td>
+
+<td class="formula">
+    =ROUND(C10*50%,0)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     HRA
+===================================================== -->
+
+<tr>
+
+<td>
+    House Rent Allowance
+</td>
+
+<td
+    id="hra"
+    class="amount">
+</td>
+
+<td
+    id="hraAnnual"
+    class="amount">
+</td>
+
+<td class="basis">
+    50% of Basic
+</td>
+
+<td class="formula">
+    =ROUND(C5*50%,0)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     TRAVEL
+===================================================== -->
+
+<tr>
+
+<td>
+    Travel Allowance
+</td>
+
+<td
+    id="travel"
+    class="amount">
+</td>
+
+<td
+    id="travelAnnual"
+    class="amount">
+</td>
+
+<td class="basis">
+    Fixed 1800
+</td>
+
+<td class="formula">
+    =1800
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     LTA
+===================================================== -->
+
+<tr>
+
+<td>
+    Leave Travel Allowance
+</td>
+
+<td
+    id="lta"
+    class="amount">
+</td>
+
+<td
+    id="ltaAnnual"
+    class="amount">
+</td>
+
+<td class="basis">
+    10% of Basic
+</td>
+
+<td class="formula">
+    =ROUND(C5*10%,0)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     OTHER ALLOWANCES
+===================================================== -->
+
+<tr>
+
+<td>
+    Other allowances
+</td>
+
+<td
+    id="other"
+    class="amount">
+</td>
+
+<td
+    id="otherAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =C3-(C5+C6+C7+C8+C12+C16)
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     GROSS
+===================================================== -->
+
+<tr class="total-row">
+
+<td>
+    Gross Salary
+</td>
+
+<td
+    id="gross"
+    class="amount">
+</td>
+
+<td
+    id="grossAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+    =SUM(C5:C9)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     STATUTORY PAYMENTS
+===================================================== -->
+
+<tr class="section-row">
+
+<td colspan="5">
+
+    Statutory Payments
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     EMPLOYER PF
+===================================================== -->
+
+<tr>
+
+<td>
+    Employer Contribution to PF
+</td>
+
+<td
+    id="employerPF"
+    class="amount">
+</td>
+
+<td
+    id="employerPFAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =ROUND(C19*13/12,0)
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     EMPLOYER ESI
+===================================================== -->
+
+<tr>
+
+<td>
+    Employer Contribution to ESI
+</td>
+
+<td
+    id="employerESI"
+    class="amount">
+</td>
+
+<td
+    id="employerESIAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =ROUND(IF(C10&lt;21000,C10*3.25%,0),0)
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     FIXED COMPENSATION
+===================================================== -->
+
+<tr class="total-row">
+
+<td>
+    Total Fixed Compensation
+</td>
+
+<td
+    id="fixedComp"
+    class="amount">
+</td>
+
+<td
+    id="fixedCompAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+    =SUM(C10:C13)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     GRATUITY
+===================================================== -->
+
+<tr>
+
+<td>
+    Gratuity
+</td>
+
+<td
+    id="gratuity"
+    class="amount">
+</td>
+
+<td
+    id="gratuityAnnual"
+    class="amount">
+</td>
+
+<td class="basis">
+    4.81% of Basic
+</td>
+
+<td class="formula">
+    =ROUND(C5*4.81%,0)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     TOTAL CTC
+===================================================== -->
+
+<tr class="total-row">
+
+<td>
+    Total Cost to Company
+</td>
+
+<td
+    id="totalCTC"
+    class="amount">
+</td>
+
+<td
+    id="totalCTCAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+    =SUM(C14:C16)
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     DEDUCTIONS
+===================================================== -->
+
+<tr class="section-row">
+
+<td colspan="5">
+
+    Deductions:
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     EMPLOYEE PF
+===================================================== -->
+
+<tr>
+
+<td>
+    Employee Contribution to PF
+</td>
+
+<td
+    id="employeePF"
+    class="amount">
+</td>
+
+<td
+    id="employeePFAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =IF((C10-C6)*12%&gt;3000,
+       3000,
+       (C10-C6)*12%)
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     EMPLOYEE ESI
+===================================================== -->
+
+<tr>
+
+<td>
+    Employee Contribution to ESI
+</td>
+
+<td
+    id="employeeESI"
+    class="amount">
+</td>
+
+<td
+    id="employeeESIAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =IF(C10&lt;21000,C10*0.75%,0)
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     PROFESSIONAL TAX
+===================================================== -->
+
+<tr>
+
+<td>
+    Professional Tax (TN)
+</td>
+
+<td
+    id="professionalTax"
+    class="amount">
+</td>
+
+<td
+    id="professionalTaxAnnual"
+    class="amount">
+</td>
+
+<td class="basis">
+    Fixed 208.33
+</td>
+
+<td class="formula">
+
+    Fixed 208.33
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     TOTAL DEDUCTIONS
+===================================================== -->
+
+<tr class="total-row">
+
+<td>
+    Total Deductions
+</td>
+
+<td
+    id="totalDeductions"
+    class="amount">
+</td>
+
+<td
+    id="totalDeductionsAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =SUM(C19:C21)
+
+</td>
+
+</tr>
+
+
+<!-- =====================================================
+     NET SALARY
+===================================================== -->
+
+<tr class="net-row">
+
+<td>
+    Net Take Home Salary
+</td>
+
+<td
+    id="netSalary"
+    class="amount">
+</td>
+
+<td
+    id="netSalaryAnnual"
+    class="amount">
+</td>
+
+<td></td>
+
+<td class="formula">
+
+    =C10-C22
+
+</td>
+
+</tr>
+
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<!-- =====================================================
+     ITERATION DEBUG INFORMATION
+===================================================== -->
+
+<div class="debug-panel">
+
+<h3>
+    Iteration Details
+</h3>
+
+
+<div class="debug-grid">
+
+
+<div class="debug-item">
+
+<span class="debug-label">
+    Iterations Requested
+</span>
+
+<span
+    class="debug-value"
+    id="debugIterations">
+    -
+</span>
+
+</div>
+
+
+<div class="debug-item">
+
+<span class="debug-label">
+    Final Gross
+</span>
+
+<span
+    class="debug-value"
+    id="debugGross">
+    -
+</span>
+
+</div>
+
+
+<div class="debug-item">
+
+<span class="debug-label">
+    Final Basic
+</span>
+
+<span
+    class="debug-value"
+    id="debugBasic">
+    -
+</span>
+
+</div>
+
+
+<div class="debug-item">
+
+<span class="debug-label">
+    Final Employee PF
+</span>
+
+<span
+    class="debug-value"
+    id="debugEmployeePF">
+    -
+</span>
+
+</div>
+
+
+<div class="debug-item">
+
+<span class="debug-label">
+    Final Employer PF
+</span>
+
+<span
+    class="debug-value"
+    id="debugEmployerPF">
+    -
+</span>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<div class="note">
+
+<strong>Note:</strong>
+The calculation engine intentionally performs the requested number
+of iterations because Basic, Gross, Employee PF, Employer PF and
+Other Allowances have a circular dependency similar to Excel's
+Iterative Calculation setting.
+
+</div>
+
 
 </div>
 
 
 <script>
 
-function formatIndian(number) {
 
-    if (number === null || number === undefined || isNaN(number)) {
+/* =========================================================
+   EXCEL ROUND FUNCTION
+=========================================================
+
+   JavaScript Math.round() is close to Excel ROUND for
+   positive salary values.
+
+   This function explicitly implements rounding to zero
+   decimal places for positive values.
+========================================================= */
+
+function excelRound(value) {
+
+    return Math.floor(value + 0.5);
+
+}
+
+
+/* =========================================================
+   INDIAN NUMBER FORMAT
+========================================================= */
+
+function formatIndian(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        isNaN(value)
+    ) {
+
         return "-";
+
     }
 
-    number = Math.round(number);
 
-    return number.toLocaleString("en-IN");
+    return Math.round(value)
+        .toLocaleString("en-IN");
+
 }
 
 
-function setValue(id, value) {
+/* =========================================================
+   DISPLAY VALUE
+========================================================= */
 
-    const element = document.getElementById(id);
+function display(id, value) {
 
-    if (value === 0) {
+    const element =
+        document.getElementById(id);
+
+
+    if (!element) {
+
+        return;
+
+    }
+
+
+    if (
+        value === null ||
+        value === undefined ||
+        isNaN(value)
+    ) {
+
         element.textContent = "-";
-    } else {
-        element.textContent = formatIndian(value);
+
+        return;
+
     }
+
+
+    element.textContent =
+        formatIndian(value);
+
 }
 
+
+/* =========================================================
+   MAIN ITERATIVE CALCULATION
+========================================================= */
 
 function calculateSalary() {
 
-    // Annual CTC entered by user
-    const annualCTC =
-        parseFloat(document.getElementById("annualCTC").value) || 0;
 
-    // Monthly CTC
-    const monthlyCTC = annualCTC / 12;
+    /*
+     * ================================================
+     * READ INPUTS
+     * ================================================
+     */
+
+    const annualCTC =
+        parseFloat(
+            document.getElementById("annualCTC").value
+        ) || 0;
+
+
+    let numberOfIterations =
+        parseInt(
+            document.getElementById(
+                "numberOfIterations"
+            ).value
+        ) || 1;
 
 
     /*
-        IMPORTANT:
-        The Excel sheet calculates Basic as 50% of Gross.
-        Gross itself is determined after statutory employer
-        contributions and gratuity are considered.
+     * Prevent an invalid / excessively large value
+     */
 
-        We solve this iteratively so the final CTC matches
-        the entered annual CTC.
-    */
+    if (numberOfIterations < 1) {
 
-    let gross = monthlyCTC * 0.90;
+        numberOfIterations = 1;
 
-    for (let i = 0; i < 100; i++) {
+    }
 
-        const basic = Math.round(gross * 0.50);
 
-        const hra = Math.round(basic * 0.50);
+    if (numberOfIterations > 1000000) {
 
-        const travel = 1800;
+        numberOfIterations = 1000000;
 
-        const lta = Math.round(basic * 0.10);
+    }
 
-        const employerPF =
-            Math.round(basic * 0.13);
 
-        const employerESI =
-            gross <= 21000
-                ? Math.round(gross * 0.0325)
+    /*
+     * ================================================
+     * MONTHLY CTC
+     *
+     * Excel:
+     *
+     * C3 = C2 / 12
+     * ================================================
+     */
+
+    const monthlyCTC =
+        annualCTC / 12;
+
+
+    /*
+     * ================================================
+     * INITIAL GROSS
+     *
+     * This is the starting point for iteration #1.
+     *
+     * Excel circular calculations depend on the previous
+     * calculated value.
+     *
+     * We start with Monthly CTC.
+     * ================================================
+     */
+
+    let gross =
+        monthlyCTC;
+
+
+    /*
+     * Variables that will contain final values.
+     */
+
+    let basic = 0;
+
+    let hra = 0;
+
+    let travelAllowance = 1800;
+
+    let leaveTravelAllowance = 0;
+
+    let otherAllowances = 0;
+
+    let employeePF = 0;
+
+    let employerPF = 0;
+
+    let employerESI = 0;
+
+    let gratuity = 0;
+
+    let employeeESI = 0;
+
+    let professionalTax = 208;
+
+    let newGross = 0;
+
+
+    /*
+     * ================================================
+     * N ITERATIONS
+     *
+     * THIS IS THE IMPORTANT PART.
+     *
+     * The calculation deliberately runs exactly N times.
+     * ================================================
+     */
+
+    for (
+        let iteration = 1;
+        iteration <= numberOfIterations;
+        iteration++
+    ) {
+
+
+        /*
+         * --------------------------------------------
+         * C5
+         *
+         * BASIC
+         *
+         * =ROUND(C10*50%,0)
+         *
+         * C10 is Gross from the PREVIOUS iteration.
+         * --------------------------------------------
+         */
+
+        basic =
+            excelRound(
+                gross * 0.50
+            );
+
+
+        /*
+         * --------------------------------------------
+         * C6
+         *
+         * HRA
+         *
+         * =ROUND(C5*50%,0)
+         * --------------------------------------------
+         */
+
+        hra =
+            excelRound(
+                basic * 0.50
+            );
+
+
+        /*
+         * --------------------------------------------
+         * C7
+         *
+         * Travel Allowance
+         *
+         * Fixed 1800
+         * --------------------------------------------
+         */
+
+        travelAllowance =
+            1800;
+
+
+        /*
+         * --------------------------------------------
+         * C8
+         *
+         * Leave Travel Allowance
+         *
+         * =ROUND(C5*10%,0)
+         * --------------------------------------------
+         */
+
+        leaveTravelAllowance =
+            excelRound(
+                basic * 0.10
+            );
+
+
+        /*
+         * --------------------------------------------
+         * C19
+         *
+         * EMPLOYEE PF
+         *
+         * =IF(
+         *     (C10-C6)*12% > 3000,
+         *     3000,
+         *     (C10-C6)*12%
+         * )
+         *
+         * IMPORTANT:
+         * Uses PREVIOUS Gross.
+         * --------------------------------------------
+         */
+
+        const employeePFCalculation =
+            (gross - hra) * 0.12;
+
+
+        if (
+            employeePFCalculation > 3000
+        ) {
+
+            employeePF = 3000;
+
+        } else {
+
+            employeePF =
+                excelRound(
+                    employeePFCalculation
+                );
+
+        }
+
+
+        /*
+         * --------------------------------------------
+         * C12
+         *
+         * EMPLOYER PF
+         *
+         * =ROUND(C19*13/12,0)
+         * --------------------------------------------
+         */
+
+        employerPF =
+            excelRound(
+                employeePF * 13 / 12
+            );
+
+
+        /*
+         * --------------------------------------------
+         * C13
+         *
+         * EMPLOYER ESI
+         *
+         * =ROUND(
+         *   IF(C10<21000,
+         *      C10*3.25%,
+         *      0),
+         *   0
+         * )
+         * --------------------------------------------
+         */
+
+        employerESI =
+            gross < 21000
+                ? excelRound(
+                    gross * 0.0325
+                  )
                 : 0;
 
-        const gratuity =
-            Math.round(basic * 0.0481);
 
-        const other =
-            Math.round(
+        /*
+         * --------------------------------------------
+         * C16
+         *
+         * GRATUITY
+         *
+         * =ROUND(C5*4.81%,0)
+         * --------------------------------------------
+         */
+
+        gratuity =
+            excelRound(
+                basic * 0.0481
+            );
+
+
+        /*
+         * --------------------------------------------
+         * C9
+         *
+         * OTHER ALLOWANCES
+         *
+         * =C3-
+         *   (C5+C6+C7+C8+C12+C16)
+         *
+         * Notice:
+         *
+         * Employee PF is NOT included.
+         *
+         * Employer PF IS included.
+         * Gratuity IS included.
+         * --------------------------------------------
+         */
+
+        otherAllowances =
+            excelRound(
                 monthlyCTC -
                 (
                     basic +
                     hra +
-                    travel +
-                    lta +
+                    travelAllowance +
+                    leaveTravelAllowance +
                     employerPF +
-                    employerESI +
                     gratuity
                 )
             );
 
-        const newGross =
+
+        /*
+         * --------------------------------------------
+         * C10
+         *
+         * GROSS SALARY
+         *
+         * =SUM(C5:C9)
+         * --------------------------------------------
+         */
+
+        newGross =
             basic +
             hra +
-            travel +
-            lta +
-            other;
+            travelAllowance +
+            leaveTravelAllowance +
+            otherAllowances;
 
-        if (Math.abs(newGross - gross) < 0.01) {
-            gross = newGross;
-            break;
-        }
 
-        gross = newGross;
+        /*
+         * --------------------------------------------
+         * C20
+         *
+         * EMPLOYEE ESI
+         *
+         * =IF(C10<21000,
+         *     C10*0.75%,
+         *     0)
+         *
+         * Uses the newly calculated Gross.
+         * --------------------------------------------
+         */
+
+        employeeESI =
+            newGross < 21000
+                ? excelRound(
+                    newGross * 0.0075
+                  )
+                : 0;
+
+
+        /*
+         * --------------------------------------------
+         * C21
+         *
+         * PROFESSIONAL TAX
+         *
+         * Fixed 208.33 / rounded display
+         * --------------------------------------------
+         */
+
+        professionalTax =
+            208;
+
+
+        /*
+         * --------------------------------------------
+         * IMPORTANT
+         *
+         * NEW GROSS BECOMES THE INPUT FOR THE
+         * NEXT ITERATION.
+         *
+         * This is what creates the Excel-like
+         * circular calculation.
+         * --------------------------------------------
+         */
+
+        gross =
+            newGross;
+
     }
 
 
-    // Earnings
-
-    const basic =
-        Math.round(gross * 0.50);
-
-    const hra =
-        Math.round(basic * 0.50);
-
-    const travel = 1800;
-
-    const lta =
-        Math.round(basic * 0.10);
+    /* =================================================
+       AFTER N ITERATIONS
+       ================================================= */
 
 
-    // Employer statutory payments
+    /*
+     * C14
+     *
+     * Total Fixed Compensation
+     */
 
-    const employerPF =
-        Math.round(basic * 0.13);
-
-    const employerESI =
-        gross <= 21000
-            ? Math.round(gross * 0.0325)
-            : 0;
-
-
-    // Gratuity
-
-    const gratuity =
-        Math.round(basic * 0.0481);
-
-
-    // Other allowances
-
-    const other =
-        Math.round(
-            monthlyCTC -
-            (
-                basic +
-                hra +
-                travel +
-                lta +
-                employerPF +
-                employerESI +
-                gratuity
-            )
-        );
-
-
-    // Gross salary
-
-    gross =
-        basic +
-        hra +
-        travel +
-        lta +
-        other;
-
-
-    // Fixed compensation
-
-    const fixedComp =
-        gross +
+    const totalFixedCompensation =
+        newGross +
         employerPF +
         employerESI;
 
 
-    // Total CTC
+    /*
+     * C17
+     *
+     * Total Cost to Company
+     */
 
     const totalCTC =
-        fixedComp +
+        totalFixedCompensation +
         gratuity;
 
 
-    // Employee PF
-
-    let employeePF =
-        Math.round(
-            (gross - hra) * 0.12
-        );
-
-    if (employeePF > 3000) {
-        employeePF = 3000;
-    }
-
-
-    // Employee ESI
-
-    const employeeESI =
-        gross < 21000
-            ? Math.round(gross * 0.0075)
-            : 0;
-
-
-    // Professional Tax
-
-    const professionalTax =
-        208.33;
-
-
-    // Total deductions
+    /*
+     * C22
+     *
+     * Total Deductions
+     */
 
     const totalDeductions =
         employeePF +
         employeeESI +
-        Math.round(professionalTax);
+        professionalTax;
 
 
-    // Net salary
+    /*
+     * C24
+     *
+     * Net Take Home
+     */
 
-    const netSalary =
-        gross -
+    const netTakeHome =
+        newGross -
         totalDeductions;
 
 
-    // Display Monthly
-
-    setValue("monthlyCTC", monthlyCTC);
-
-    setValue("basic", basic);
-
-    setValue("hra", hra);
-
-    setValue("travel", travel);
-
-    setValue("lta", lta);
-
-    setValue("other", other);
-
-    setValue("gross", gross);
-
-    setValue("employerPF", employerPF);
-
-    setValue("employerESI", employerESI);
-
-    setValue("fixedComp", fixedComp);
-
-    setValue("gratuity", gratuity);
-
-    setValue("totalCTC", totalCTC);
-
-    setValue("employeePF", employeePF);
-
-    setValue("employeeESI", employeeESI);
-
-    setValue("professionalTax", professionalTax);
-
-    setValue("totalDeductions", totalDeductions);
-
-    setValue("netSalary", netSalary);
+    /* =================================================
+       UPDATE TABLE
+       ================================================= */
 
 
-    // Display Annual
+    /*
+     * BASIC
+     */
 
-    setValue("annualCTCDisplay", annualCTC);
-
-    setValue("basicAnnual", basic * 12);
-
-    setValue("hraAnnual", hra * 12);
-
-    setValue("travelAnnual", travel * 12);
-
-    setValue("ltaAnnual", lta * 12);
-
-    setValue("otherAnnual", other * 12);
-
-    setValue("grossAnnual", gross * 12);
-
-    setValue("employerPFAnnual", employerPF * 12);
-
-    setValue("employerESIAnnual", employerESI * 12);
-
-    setValue("fixedCompAnnual", fixedComp * 12);
-
-    setValue("gratuityAnnual", gratuity * 12);
-
-    setValue("totalCTCAnnual", totalCTC * 12);
-
-    setValue("employeePFAnnual", employeePF * 12);
-
-    setValue("employeeESIAnnual", employeeESI * 12);
-
-    setValue(
-        "professionalTaxAnnual",
-        Math.round(professionalTax * 12)
+    display(
+        "basic",
+        basic
     );
 
-    setValue(
+    display(
+        "basicAnnual",
+        basic * 12
+    );
+
+
+    /*
+     * HRA
+     */
+
+    display(
+        "hra",
+        hra
+    );
+
+    display(
+        "hraAnnual",
+        hra * 12
+    );
+
+
+    /*
+     * TRAVEL
+     */
+
+    display(
+        "travel",
+        travelAllowance
+    );
+
+    display(
+        "travelAnnual",
+        travelAllowance * 12
+    );
+
+
+    /*
+     * LTA
+     */
+
+    display(
+        "lta",
+        leaveTravelAllowance
+    );
+
+    display(
+        "ltaAnnual",
+        leaveTravelAllowance * 12
+    );
+
+
+    /*
+     * OTHER
+     */
+
+    display(
+        "other",
+        otherAllowances
+    );
+
+    display(
+        "otherAnnual",
+        otherAllowances * 12
+    );
+
+
+    /*
+     * GROSS
+     */
+
+    display(
+        "gross",
+        newGross
+    );
+
+    display(
+        "grossAnnual",
+        newGross * 12
+    );
+
+
+    /*
+     * EMPLOYER PF
+     */
+
+    display(
+        "employerPF",
+        employerPF
+    );
+
+    display(
+        "employerPFAnnual",
+        employerPF * 12
+    );
+
+
+    /*
+     * EMPLOYER ESI
+     */
+
+    display(
+        "employerESI",
+        employerESI
+    );
+
+    display(
+        "employerESIAnnual",
+        employerESI * 12
+    );
+
+
+    /*
+     * FIXED COMPENSATION
+     */
+
+    display(
+        "fixedComp",
+        totalFixedCompensation
+    );
+
+    display(
+        "fixedCompAnnual",
+        totalFixedCompensation * 12
+    );
+
+
+    /*
+     * GRATUITY
+     */
+
+    display(
+        "gratuity",
+        gratuity
+    );
+
+    display(
+        "gratuityAnnual",
+        gratuity * 12
+    );
+
+
+    /*
+     * TOTAL CTC
+     */
+
+    display(
+        "totalCTC",
+        totalCTC
+    );
+
+    display(
+        "totalCTCAnnual",
+        totalCTC * 12
+    );
+
+
+    /*
+     * EMPLOYEE PF
+     */
+
+    display(
+        "employeePF",
+        employeePF
+    );
+
+    display(
+        "employeePFAnnual",
+        employeePF * 12
+    );
+
+
+    /*
+     * EMPLOYEE ESI
+     */
+
+    display(
+        "employeeESI",
+        employeeESI
+    );
+
+    display(
+        "employeeESIAnnual",
+        employeeESI * 12
+    );
+
+
+    /*
+     * PROFESSIONAL TAX
+     */
+
+    display(
+        "professionalTax",
+        professionalTax
+    );
+
+    display(
+        "professionalTaxAnnual",
+        professionalTax * 12
+    );
+
+
+    /*
+     * TOTAL DEDUCTIONS
+     */
+
+    display(
+        "totalDeductions",
+        totalDeductions
+    );
+
+    display(
         "totalDeductionsAnnual",
         totalDeductions * 12
     );
 
-    setValue(
-        "netSalaryAnnual",
-        netSalary * 12
+
+    /*
+     * NET SALARY
+     */
+
+    display(
+        "netSalary",
+        netTakeHome
     );
+
+    display(
+        "netSalaryAnnual",
+        netTakeHome * 12
+    );
+
+
+    /* =================================================
+       DEBUG INFORMATION
+       ================================================= */
+
+    display(
+        "debugIterations",
+        numberOfIterations
+    );
+
+    display(
+        "debugGross",
+        newGross
+    );
+
+    display(
+        "debugBasic",
+        basic
+    );
+
+    display(
+        "debugEmployeePF",
+        employeePF
+    );
+
+    display(
+        "debugEmployerPF",
+        employerPF
+    );
+
+
+    /*
+     * STATUS
+     */
+
+    document.getElementById("status").innerHTML =
+
+        "✓ Calculation completed — " +
+
+        numberOfIterations.toLocaleString("en-IN") +
+
+        " iterations executed. " +
+
+        "Final Gross: ₹" +
+
+        formatIndian(newGross) +
+
+        " | Basic: ₹" +
+
+        formatIndian(basic);
+
 }
 
 
-// Calculate when page loads
+/* =========================================================
+   AUTOMATIC CALCULATION WHEN PAGE LOADS
+========================================================= */
 
-calculateSalary();
+window.onload = function() {
+
+    calculateSalary();
+
+};
+
+
+/* =========================================================
+   RECALCULATE WHEN CTC CHANGES
+========================================================= */
+
+document
+    .getElementById("annualCTC")
+    .addEventListener(
+        "input",
+        calculateSalary
+    );
+
 
 </script>
 
+
 </body>
+
 </html>
