@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CTC Salary Calculator</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 25px;
+        background: #f4f6f8;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #222;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+        text-align: center;
+        margin: 5px 0 20px;
+        font-size: 26px;
+    }
+
+    .input-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .input-section label {
+        font-weight: bold;
+    }
+
+    .input-section input {
+        width: 220px;
+        padding: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        border: 2px solid #aaa;
+        border-radius: 4px;
+    }
+
+    .input-section span {
+        color: #d00000;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    th,
+    td {
+        border: 1px solid #aaa;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    th {
+        background: #8ea9c4;
+        color: #000;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    td:first-child {
+        width: 32%;
+        text-align: left;
+    }
+
+    td:nth-child(2),
+    td:nth-child(3) {
+        width: 18%;
+        text-align: right;
+    }
+
+    td:nth-child(4) {
+        width: 20%;
+        text-align: left;
+        color: #e00000;
+        font-weight: bold;
+    }
+
+    td:nth-child(5) {
+        width: 32%;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+    }
+
+    .section {
+        background: #8ea9c4;
+        font-weight: bold;
+    }
+
+    .highlight {
+        background: #ffff00;
+        font-weight: bold;
+    }
+
+    .total {
+        background: #8ea9c4;
+        font-weight: bold;
+    }
+
+    .net {
+        background: #ffff00;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .amount {
+        font-weight: bold;
+    }
+
+    .formula {
+        color: #333;
+    }
+
+    .note {
+        margin-top: 15px;
+        font-size: 13px;
+        color: #666;
+    }
+
+    @media (max-width: 800px) {
+
+        body {
+            padding: 10px;
+        }
+
+        .container {
+            padding: 10px;
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 900px;
+        }
+
+        h1 {
+            font-size: 22px;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>CTC Salary Calculator</h1>
+
+    <div class="input-section">
+        <label for="annualCTC">Annual CTC</label>
+
+        <input
+            type="number"
+            id="annualCTC"
+            value="500000"
+            min="0"
+            step="1000"
+            oninput="calculateSalary()"
+        >
+
+        <span>&larr;&larr;&larr; Enter here</span>
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Monthly Components</th>
+                <th>Per Month</th>
+                <th>Annualized</th>
+                <th>Calculation Basis</th>
+                <th>Formula</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <!-- CTC -->
+            <tr class="highlight">
+                <td><strong>Annual CTC</strong></td>
+                <td id="monthlyCTC">41,667</td>
+                <td id="annualCTCDisplay">5,00,000</td>
+                <td></td>
+                <td class="formula">Annual CTC / 12</td>
+            </tr>
+
+            <!-- Earnings -->
+            <tr>
+                <td>Basic</td>
+                <td class="amount" id="basic">18,757</td>
+                <td class="amount" id="basicAnnual">2,25,084</td>
+                <td>50% of Gross</td>
+                <td class="formula">ROUND(Gross × 50%, 0)</td>
+            </tr>
+
+            <tr>
+                <td>House Rent Allowance</td>
+                <td class="amount" id="hra">9,379</td>
+                <td class="amount" id="hraAnnual">1,12,548</td>
+                <td>50% of Basic</td>
+                <td class="formula">ROUND(Basic × 50%, 0)</td>
+            </tr>
+
+            <tr>
+                <td>Travel Allowance</td>
+                <td class="amount" id="travel">1,800</td>
+                <td class="amount" id="travelAnnual">21,600</td>
+                <td>Fixed 1800</td>
+                <td class="formula">1,800</td>
+            </tr>
+
+            <tr>
+                <td>Leave Travel Allowance</td>
+                <td class="amount" id="lta">1,876</td>
+                <td class="amount" id="ltaAnnual">22,512</td>
+                <td>10% of Basic</td>
+                <td class="formula">ROUND(Basic × 10%, 0)</td>
+            </tr>
+
+            <tr>
+                <td>Other Allowances</td>
+                <td class="amount" id="other">5,703</td>
+                <td class="amount" id="otherAnnual">68,436</td>
+                <td></td>
+                <td class="formula">
+                    Monthly CTC − Basic − HRA − Travel − LTA − Employer PF − Gratuity
+                </td>
+            </tr>
+
+            <tr class="total">
+                <td>Gross Salary</td>
+                <td id="gross">37,515</td>
+                <td id="grossAnnual">4,50,180</td>
+                <td></td>
+                <td class="formula">SUM(Basic:HRA:Travel:LTA:Other)</td>
+            </tr>
+
+            <!-- Statutory -->
+            <tr>
+                <td colspan="5" class="section">Statutory Payments</td>
+            </tr>
+
+            <tr>
+                <td>Employer Contribution to PF</td>
+                <td id="employerPF">3,250</td>
+                <td id="employerPFAnnual">39,000</td>
+                <td></td>
+                <td class="formula">ROUND(Basic × 13%, 0)</td>
+            </tr>
+
+            <tr>
+                <td>Employer Contribution to ESI</td>
+                <td id="employerESI">-</td>
+                <td id="employerESIAnnual">-</td>
+                <td></td>
+                <td class="formula">IF(Gross ≤ 21,000, Gross × 3.25%, 0)</td>
+            </tr>
+
+            <tr class="total">
+                <td>Total Fixed Compensation</td>
+                <td id="fixedComp">40,765</td>
+                <td id="fixedCompAnnual">4,89,180</td>
+                <td></td>
+                <td class="formula">Gross + Employer PF + Employer ESI</td>
+            </tr>
+
+            <!-- Gratuity -->
+            <tr>
+                <td>Gratuity</td>
+                <td id="gratuity">902</td>
+                <td id="gratuityAnnual">10,824</td>
+                <td>4.81% of Basic</td>
+                <td class="formula">ROUND(Basic × 4.81%, 0)</td>
+            </tr>
+
+            <tr class="total">
+                <td>Total Cost to Company</td>
+                <td id="totalCTC">41,667</td>
+                <td id="totalCTCAnnual">5,00,004</td>
+                <td></td>
+                <td class="formula">Fixed Compensation + Gratuity</td>
+            </tr>
+
+            <!-- Deductions -->
+            <tr>
+                <td colspan="5" class="section">Deductions:</td>
+            </tr>
+
+            <tr>
+                <td>Employee Contribution to PF</td>
+                <td id="employeePF">3,000</td>
+                <td id="employeePFAnnual">36,000</td>
+                <td></td>
+                <td class="formula">
+                    MIN((Gross − HRA) × 12%, 3,000)
+                </td>
+            </tr>
+
+            <tr>
+                <td>Employee Contribution to ESI</td>
+                <td id="employeeESI">-</td>
+                <td id="employeeESIAnnual">-</td>
+                <td></td>
+                <td class="formula">IF(Gross &lt; 21,000, Gross × 0.75%, 0)</td>
+            </tr>
+
+            <tr>
+                <td>Professional Tax (TN)</td>
+                <td id="professionalTax">208</td>
+                <td id="professionalTaxAnnual">2,500</td>
+                <td>Fixed 208.33</td>
+                <td class="formula">208.33</td>
+            </tr>
+
+            <tr class="total">
+                <td>Total Deductions</td>
+                <td id="totalDeductions">3,208</td>
+                <td id="totalDeductionsAnnual">38,500</td>
+                <td></td>
+                <td class="formula">PF + ESI + Professional Tax</td>
+            </tr>
+
+            <!-- Net -->
+            <tr class="net">
+                <td>Net Take Home Salary</td>
+                <td id="netSalary">34,307</td>
+                <td id="netSalaryAnnual">4,11,684</td>
+                <td></td>
+                <td class="formula">Gross − Total Deductions</td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <div class="note">
+        * Salary calculations are illustrative. PF, ESI and Professional Tax rules may vary
+        based on applicable employment regulations and company policy.
+    </div>
+
+</div>
+
+
+<script>
+
+function formatIndian(number) {
+
+    if (number === null || number === undefined || isNaN(number)) {
+        return "-";
+    }
+
+    number = Math.round(number);
+
+    return number.toLocaleString("en-IN");
+}
+
+
+function setValue(id, value) {
+
+    const element = document.getElementById(id);
+
+    if (value === 0) {
+        element.textContent = "-";
+    } else {
+        element.textContent = formatIndian(value);
+    }
+}
+
+
+function calculateSalary() {
+
+    // Annual CTC entered by user
+    const annualCTC =
+        parseFloat(document.getElementById("annualCTC").value) || 0;
+
+    // Monthly CTC
+    const monthlyCTC = annualCTC / 12;
+
+
+    /*
+        IMPORTANT:
+        The Excel sheet calculates Basic as 50% of Gross.
+        Gross itself is determined after statutory employer
+        contributions and gratuity are considered.
+
+        We solve this iteratively so the final CTC matches
+        the entered annual CTC.
+    */
+
+    let gross = monthlyCTC * 0.90;
+
+    for (let i = 0; i < 100; i++) {
+
+        const basic = Math.round(gross * 0.50);
+
+        const hra = Math.round(basic * 0.50);
+
+        const travel = 1800;
+
+        const lta = Math.round(basic * 0.10);
+
+        const employerPF =
+            Math.round(basic * 0.13);
+
+        const employerESI =
+            gross <= 21000
+                ? Math.round(gross * 0.0325)
+                : 0;
+
+        const gratuity =
+            Math.round(basic * 0.0481);
+
+        const other =
+            Math.round(
+                monthlyCTC -
+                (
+                    basic +
+                    hra +
+                    travel +
+                    lta +
+                    employerPF +
+                    employerESI +
+                    gratuity
+                )
+            );
+
+        const newGross =
+            basic +
+            hra +
+            travel +
+            lta +
+            other;
+
+        if (Math.abs(newGross - gross) < 0.01) {
+            gross = newGross;
+            break;
+        }
+
+        gross = newGross;
+    }
+
+
+    // Earnings
+
+    const basic =
+        Math.round(gross * 0.50);
+
+    const hra =
+        Math.round(basic * 0.50);
+
+    const travel = 1800;
+
+    const lta =
+        Math.round(basic * 0.10);
+
+
+    // Employer statutory payments
+
+    const employerPF =
+        Math.round(basic * 0.13);
+
+    const employerESI =
+        gross <= 21000
+            ? Math.round(gross * 0.0325)
+            : 0;
+
+
+    // Gratuity
+
+    const gratuity =
+        Math.round(basic * 0.0481);
+
+
+    // Other allowances
+
+    const other =
+        Math.round(
+            monthlyCTC -
+            (
+                basic +
+                hra +
+                travel +
+                lta +
+                employerPF +
+                employerESI +
+                gratuity
+            )
+        );
+
+
+    // Gross salary
+
+    gross =
+        basic +
+        hra +
+        travel +
+        lta +
+        other;
+
+
+    // Fixed compensation
+
+    const fixedComp =
+        gross +
+        employerPF +
+        employerESI;
+
+
+    // Total CTC
+
+    const totalCTC =
+        fixedComp +
+        gratuity;
+
+
+    // Employee PF
+
+    let employeePF =
+        Math.round(
+            (gross - hra) * 0.12
+        );
+
+    if (employeePF > 3000) {
+        employeePF = 3000;
+    }
+
+
+    // Employee ESI
+
+    const employeeESI =
+        gross < 21000
+            ? Math.round(gross * 0.0075)
+            : 0;
+
+
+    // Professional Tax
+
+    const professionalTax =
+        208.33;
+
+
+    // Total deductions
+
+    const totalDeductions =
+        employeePF +
+        employeeESI +
+        Math.round(professionalTax);
+
+
+    // Net salary
+
+    const netSalary =
+        gross -
+        totalDeductions;
+
+
+    // Display Monthly
+
+    setValue("monthlyCTC", monthlyCTC);
+
+    setValue("basic", basic);
+
+    setValue("hra", hra);
+
+    setValue("travel", travel);
+
+    setValue("lta", lta);
+
+    setValue("other", other);
+
+    setValue("gross", gross);
+
+    setValue("employerPF", employerPF);
+
+    setValue("employerESI", employerESI);
+
+    setValue("fixedComp", fixedComp);
+
+    setValue("gratuity", gratuity);
+
+    setValue("totalCTC", totalCTC);
+
+    setValue("employeePF", employeePF);
+
+    setValue("employeeESI", employeeESI);
+
+    setValue("professionalTax", professionalTax);
+
+    setValue("totalDeductions", totalDeductions);
+
+    setValue("netSalary", netSalary);
+
+
+    // Display Annual
+
+    setValue("annualCTCDisplay", annualCTC);
+
+    setValue("basicAnnual", basic * 12);
+
+    setValue("hraAnnual", hra * 12);
+
+    setValue("travelAnnual", travel * 12);
+
+    setValue("ltaAnnual", lta * 12);
+
+    setValue("otherAnnual", other * 12);
+
+    setValue("grossAnnual", gross * 12);
+
+    setValue("employerPFAnnual", employerPF * 12);
+
+    setValue("employerESIAnnual", employerESI * 12);
+
+    setValue("fixedCompAnnual", fixedComp * 12);
+
+    setValue("gratuityAnnual", gratuity * 12);
+
+    setValue("totalCTCAnnual", totalCTC * 12);
+
+    setValue("employeePFAnnual", employeePF * 12);
+
+    setValue("employeeESIAnnual", employeeESI * 12);
+
+    setValue(
+        "professionalTaxAnnual",
+        Math.round(professionalTax * 12)
+    );
+
+    setValue(
+        "totalDeductionsAnnual",
+        totalDeductions * 12
+    );
+
+    setValue(
+        "netSalaryAnnual",
+        netSalary * 12
+    );
+}
+
+
+// Calculate when page loads
+
+calculateSalary();
+
+</script>
+
+</body>
+</html>
